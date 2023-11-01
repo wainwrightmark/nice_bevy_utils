@@ -22,8 +22,10 @@ impl<T: Resource + Serialize + DeserializeOwned + TrackableResource>
     fn track_changes(mut pkv: ResMut<PkvStore>, data: Res<T>) {
         if data.is_changed() {
             let key = <T as TrackableResource>::KEY;
-            pkv.set(key, data.as_ref())
-                .unwrap_or_else(|_| panic!("Failed to store {}", type_name::<T>()));
+
+            if let Err(err) = pkv.set(key, data.as_ref()) {
+                panic!("Failed to store {} {err}", type_name::<T>())
+            }
         }
     }
 }
