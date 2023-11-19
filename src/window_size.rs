@@ -59,9 +59,9 @@ pub fn handle_window_resized<B: Breakpoints>(
     mut window_size: ResMut<WindowSize<B>>,
     mut ui_scale: ResMut<UiScale>,
 ) {
-    for ev in window_resized_events.iter() {
+    for ev in window_resized_events.read() {
         *window_size = WindowSize::new(ev.width, ev.height);
 
-        ui_scale.scale = window_size.object_scale as f64;
+        ui_scale.0 = window_size.object_scale as f64;
     }
 }
