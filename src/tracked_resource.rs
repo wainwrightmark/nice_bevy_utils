@@ -45,7 +45,7 @@ impl<T: Resource +  Serialize + DeserializeOwned + TrackableResource + Clone> Pl
             .get_resource::<PkvStore>()
             .expect("To track a resource, you must add a PkvStore");
 
-        let value = match store.get(<T as TrackableResource>::KEY) {
+        let mut value = match store.get(<T as TrackableResource>::KEY) {
             Ok(v) => v,
             Err(e) => {
                 use bevy_pkv::GetError::*;
@@ -58,6 +58,8 @@ impl<T: Resource +  Serialize + DeserializeOwned + TrackableResource + Clone> Pl
                 }
             }
         };
+
+        T::on_loaded(&mut value);
 
         app.insert_resource(value);
     }

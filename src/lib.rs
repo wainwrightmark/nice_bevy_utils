@@ -11,6 +11,9 @@ pub trait TrackableResource:
     bevy::prelude::Resource + serde::Serialize + serde::de::DeserializeOwned + Clone
 {
     const KEY: &'static str;
+
+    /// Optional function that is called when the resource is loaded
+    fn on_loaded(&mut self){}
 }
 
 pub trait CanInitTrackedResource {
