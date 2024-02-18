@@ -32,6 +32,7 @@ impl<T: Event> AsyncEventWriter<T> {
         self.0.send(event).await
     }
 
+    #[cfg( not(target_family = "wasm"))]
     pub fn send_blocking(&self, event: T) -> Result<(), SendError<T>> {
         self.0.send_blocking(event)
     }
