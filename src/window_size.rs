@@ -62,6 +62,6 @@ pub fn handle_window_resized<B: Breakpoints>(
     for ev in window_resized_events.read() {
         *window_size = WindowSize::new(ev.width, ev.height);
 
-        ui_scale.0 = window_size.object_scale as f64;
+        ui_scale.0 = window_size.object_scale;
     }
 }

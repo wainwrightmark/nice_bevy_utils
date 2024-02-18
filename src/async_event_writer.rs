@@ -20,7 +20,7 @@ impl<T: Event> Plugin for AsyncEventPlugin<T> {
 
 fn poll_events<T: Event>(channels: Res<AsyncEventResource<T>>, mut writer: EventWriter<T>) {
     while let Ok(ev) = channels.receiver.try_recv() {
-        writer.send(ev)
+        writer.send(ev);
     }
 }
 
