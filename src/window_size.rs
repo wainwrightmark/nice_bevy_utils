@@ -54,14 +54,25 @@ impl<B: Breakpoints> FromWorld for WindowSize<B> {
     }
 }
 
+#[cfg(feature = "bevy_ui")]
 pub fn handle_window_resized<B: Breakpoints>(
     mut window_resized_events: EventReader<WindowResized>,
     mut window_size: ResMut<WindowSize<B>>,
+
     mut ui_scale: ResMut<UiScale>,
 ) {
     for ev in window_resized_events.read() {
         *window_size = WindowSize::new(ev.width, ev.height);
-
         ui_scale.0 = window_size.object_scale;
+    }
+}
+
+#[cfg(not(feature = "bevy_ui"))]
+pub fn handle_window_resized<B: Breakpoints>(
+    mut window_resized_events: EventReader<WindowResized>,
+    mut window_size: ResMut<WindowSize<B>>,
+) {
+    for ev in window_resized_events.read() {
+        *window_size = WindowSize::new(ev.width, ev.height);
     }
 }

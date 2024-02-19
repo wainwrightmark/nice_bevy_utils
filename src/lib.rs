@@ -4,7 +4,6 @@ use bevy::prelude::{App, Event};
 pub mod async_event_writer;
 #[cfg(feature = "bevy_pkv")]
 pub mod tracked_resource;
-#[cfg(feature = "bevy_ui")]
 pub mod window_size;
 
 pub trait TrackableResource:
