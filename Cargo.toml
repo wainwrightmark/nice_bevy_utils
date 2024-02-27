@@ -10,7 +10,6 @@ edition = "2021"
 [dependencies]
 
 bevy_pkv = {  optional = true, git = "https://github.com/johanhelsing/bevy_pkv"}
-async-channel = { version = "2.2", optional = true}
 serde = { version = "1", default-features = false }
 
 
@@ -23,5 +22,5 @@ features = []
 
 [features]
 bevy_pkv =["dep:bevy_pkv"]
-async-channel =["dep:async-channel"]
+
 bevy_ui = ["bevy/bevy_ui"]

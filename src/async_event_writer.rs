@@ -1,6 +1,6 @@
-use async_channel::SendError;
 use bevy::{ecs::system::SystemParam, prelude::*};
 use std::marker::PhantomData;
+use std::sync::mpsc::*;
 
 pub(crate) struct AsyncEventPlugin<T: Event>(PhantomData<T>);
 
@@ -14,36 +14,31 @@ impl<T: Event> Plugin for AsyncEventPlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_event::<T>()
             .add_systems(Update, poll_events::<T>)
-            .init_resource::<AsyncEventResource<T>>();
+            .init_non_send_resource::<AsyncEventResource<T>>();
     }
 }
 
-fn poll_events<T: Event>(channels: Res<AsyncEventResource<T>>, mut writer: EventWriter<T>) {
+fn poll_events<T: Event>(channels: NonSend<AsyncEventResource<T>>, mut writer: EventWriter<T>) {
     while let Ok(ev) = channels.receiver.try_recv() {
         writer.send(ev);
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct AsyncEventWriter<T: Event>(async_channel::Sender<T>);
+pub struct AsyncEventWriter<T: Event>(Sender<T>);
 
 impl<T: Event> AsyncEventWriter<T> {
-    pub async fn send_async(&self, event: T) -> Result<(), SendError<T>> {
-        self.0.send(event).await
+    pub fn send(&self, event: T) -> Result<(), SendError<T>> {
+        self.0.send(event)
     }
 
-    pub async fn send_async_or_panic(&self, event: T) -> () {
-        match self.0.send(event).await{
-            Ok(()) => {},
+    pub fn send_or_panic(&self, event: T) -> () {
+        match self.0.send(event) {
+            Ok(()) => {}
             Err(err) => {
                 panic!("{err}")
-            },
+            }
         }
-    }
-
-    #[cfg( not(target_family = "wasm"))]
-    pub fn send_blocking(&self, event: T) -> Result<(), SendError<T>> {
-        self.0.send_blocking(event)
     }
 }
 
@@ -64,22 +59,25 @@ unsafe impl<T: Event> SystemParam for AsyncEventWriter<T> {
         world: bevy::ecs::world::unsafe_world_cell::UnsafeWorldCell<'world>,
         _: bevy::ecs::component::Tick,
     ) -> Self::Item<'world, 'state> {
-        match world.get_resource::<AsyncEventResource<T>>() {
+        match world.get_non_send_resource::<AsyncEventResource<T>>() {
             Some(resource) => Self(resource.sender.clone()),
-            None => panic!("Event {} is not registered as an async event", std::any::type_name::<T>()),
+            None => panic!(
+                "Event {} is not registered as an async event",
+                std::any::type_name::<T>()
+            ),
         }
     }
 }
 
 #[derive(Resource)]
 struct AsyncEventResource<T: Event> {
-    sender: async_channel::Sender<T>,
-    receiver: async_channel::Receiver<T>,
+    sender: Sender<T>,
+    receiver: Receiver<T>,
 }
 
 impl<T: Event> Default for AsyncEventResource<T> {
     fn default() -> Self {
-        let (sender, receiver) = async_channel::unbounded();
+        let (sender, receiver) = std::sync::mpsc::channel();
         Self { sender, receiver }
     }
 }

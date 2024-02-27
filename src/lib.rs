@@ -1,6 +1,5 @@
 use bevy::prelude::{App, Event};
 
-#[cfg(feature = "async-channel")]
 pub mod async_event_writer;
 #[cfg(feature = "bevy_pkv")]
 pub mod tracked_resource;
@@ -52,10 +51,8 @@ pub trait CanRegisterAsyncEvent {
 
 impl CanRegisterAsyncEvent for App {
     fn register_async_event<E: Event>(&mut self) -> &mut Self {
-        #[cfg(feature = "async-channel")]
+
         self.add_plugins(crate::async_event_writer::AsyncEventPlugin::<E>::default());
-        #[cfg(not(feature = "async-channel"))]
-        self.add_event::<E>();
         self
     }
 }
