@@ -9,7 +9,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 
-bevy_pkv = {  optional = true, git = "https://github.com/johanhelsing/bevy_pkv"}
+bevy_pkv = {version = "0.10.0", optional = true}
 serde = { version = "1", default-features = false }
 
 
