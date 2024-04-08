@@ -6,6 +6,7 @@ pub mod tracked_resource;
 pub mod window_size;
 pub mod any_event_writer;
 pub mod any_res_mut;
+pub mod asynchronous;
 
 
 
