@@ -39,7 +39,7 @@ impl<T: Resource +  Serialize + DeserializeOwned + TrackableResource + Clone> Pl
     }
 
     fn finish(&self, app: &mut App) {
-        let world = &app.world;
+        let world = &app.world();
 
         let store = world
             .get_resource::<PkvStore>()
