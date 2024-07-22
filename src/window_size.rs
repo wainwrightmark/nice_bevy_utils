@@ -1,16 +1,14 @@
-use std::marker::PhantomData;
-
 use bevy::prelude::*;
-use bevy::window::{PrimaryWindow, WindowResized};
+use bevy::window::{PrimaryWindow, WindowResized, WindowScaleFactorChanged};
 
 // Track window size an automatically adjust UI scale
 #[derive(Default)]
-pub struct WindowSizePlugin<B: Breakpoints>(PhantomData<B>);
+pub struct WindowSizePlugin;
 
-impl<B: Breakpoints> Plugin for WindowSizePlugin<B> {
+impl Plugin for WindowSizePlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<WindowSize<B>>()
-            .add_systems(Update, handle_window_resized::<B>);
+        app.init_resource::<WindowSize>()
+            .add_systems(Update, handle_window_resized);
     }
 }
 
@@ -22,57 +20,66 @@ pub trait Breakpoints: Default + Send + Sync + 'static {
 }
 
 #[derive(Debug, PartialEq, Resource)]
-pub struct WindowSize<B: Breakpoints> {
-    pub size_scale: f32,
-    pub object_scale: f32,
-    pub scaled_width: f32,
-    pub scaled_height: f32,
-
-    phantom: PhantomData<B>,
+pub struct WindowSize {
+    pub logical_width: f32,
+    pub logical_height: f32,
+    pub scale_factor: f32,
 }
 
-impl<B: Breakpoints> WindowSize<B> {
-    pub fn new(raw_window_width: f32, raw_window_height: f32) -> Self {
-        let size_scale = B::size_scale(raw_window_width, raw_window_height);
+impl WindowSize {
+    pub fn to_window_resolution(&self) -> bevy::window::WindowResolution {
+        let mut res = bevy::window::WindowResolution::default();
+        res.set_scale_factor(self.scale_factor);
+        res.set(self.logical_width, self.logical_height);
+        res
+    }
 
+    pub fn clamp_to_resize_constraints(&mut self, constraints: &WindowResizeConstraints) {
+        self.logical_width = self
+            .logical_width
+            .clamp(constraints.min_width, constraints.max_width);
+        self.logical_height = self
+            .logical_height
+            .clamp(constraints.min_height, constraints.max_height);
+    }
+}
+
+impl<'w> From<&'w Window> for WindowSize {
+    fn from(value: &'w Window) -> Self {
         Self {
-            size_scale,
-            object_scale: size_scale.recip(),
-            scaled_width: raw_window_width * size_scale,
-            scaled_height: raw_window_height * size_scale,
-            phantom: PhantomData,
+            logical_height: value.height(),
+            logical_width: value.width(),
+            scale_factor: value.scale_factor(),
         }
     }
 }
 
-impl<B: Breakpoints> FromWorld for WindowSize<B> {
+impl FromWorld for WindowSize {
     fn from_world(world: &mut World) -> Self {
         let mut query = world.query_filtered::<&Window, With<PrimaryWindow>>();
         let window = query.single(world);
 
-        WindowSize::new(window.width(), window.height())
+        window.into()
     }
 }
 
-#[cfg(feature = "bevy_ui")]
-pub fn handle_window_resized<B: Breakpoints>(
+pub fn handle_window_resized(
     mut window_resized_events: EventReader<WindowResized>,
-    mut window_size: ResMut<WindowSize<B>>,
-
-    mut ui_scale: ResMut<UiScale>,
+    mut window_scale_factor_events: EventReader<WindowScaleFactorChanged>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    mut window_size: ResMut<WindowSize>,
 ) {
-    for ev in window_resized_events.read() {
-        *window_size = WindowSize::new(ev.width, ev.height);
-        ui_scale.0 = window_size.object_scale;
+    for _ in window_resized_events.read() {
+        let window = window_query.single();
+        if window_size.set_if_neq(window.into()) {
+            info!("1 Window Resized: {window_size:?}")
+        }
     }
-}
 
-#[cfg(not(feature = "bevy_ui"))]
-pub fn handle_window_resized<B: Breakpoints>(
-    mut window_resized_events: EventReader<WindowResized>,
-    mut window_size: ResMut<WindowSize<B>>,
-) {
-    for ev in window_resized_events.read() {
-        *window_size = WindowSize::new(ev.width, ev.height);
+    for _ in window_scale_factor_events.read() {
+        let window = window_query.single();
+        if window_size.set_if_neq(window.into()) {
+            info!("1 Scale factor changed: {window_size:?}")
+        }
     }
 }
