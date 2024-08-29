@@ -7,8 +7,10 @@ pub struct WindowSizePlugin;
 
 impl Plugin for WindowSizePlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<WindowSize>()
-            .add_systems(Update, handle_window_resized);
+        app.init_resource::<WindowSize>();
+
+        app.add_systems(Update, handle_window_resized);
+        app.add_systems(PreUpdate, touch_text_2d_on_window_size_changed.run_if(|ws: Res<WindowSize>|ws.is_changed()));
     }
 }
 
@@ -80,6 +82,15 @@ pub fn handle_window_resized(
         let window = window_query.single();
         if window_size.set_if_neq(window.into()) {
             info!("1 Scale factor changed: {window_size:?}")
+        }
+    }
+}
+
+
+fn touch_text_2d_on_window_size_changed(ws: Res<WindowSize>, mut query: Query<&mut bevy::text::Text2dBounds>){
+    if ws.is_changed(){
+        for mut x in query.iter_mut(){
+            x.set_changed();
         }
     }
 }
