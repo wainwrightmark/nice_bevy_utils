@@ -1,4 +1,4 @@
-use crate::layout::prelude::*;
+use crate::{layout::prelude::*, window_size::WindowSize};
 use glam::Vec2;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -6,7 +6,7 @@ pub struct LayoutSizing {
     pub size_ratio: f32,
     pub left_pad: f32,
     pub bottom_pad: f32,
-    pub insets: Insets
+    pub insets: Insets,
 }
 
 impl Default for LayoutSizing {
@@ -15,13 +15,35 @@ impl Default for LayoutSizing {
             size_ratio: 1.0,
             left_pad: 0.0,
             bottom_pad: 0.0,
-            insets: Insets::default()
+            insets: Insets::default(),
         }
     }
 }
 
 impl LayoutSizing {
-    pub fn from_page_size(page_size: Vec2, ideal_ratio: f32, ideal_width: f32, insets: Insets) -> Self {
+    pub fn from_window_size(
+        window_size: &WindowSize,
+        insets: Insets,
+        ideal_ratio: f32,
+        ideal_width: f32,
+    ) -> Self {
+        LayoutSizing::from_page_size(
+            Vec2 {
+                x: window_size.logical_width as f32,
+                y: window_size.logical_height as f32,
+            },
+            ideal_ratio,
+            ideal_width,
+            insets,
+        )
+    }
+
+    pub fn from_page_size(
+        page_size: Vec2,
+        ideal_ratio: f32,
+        ideal_width: f32,
+        insets: Insets,
+    ) -> Self {
         let ratio = page_size.x / page_size.y;
 
         let used_y: f32;
@@ -45,7 +67,7 @@ impl LayoutSizing {
             size_ratio,
             left_pad,
             bottom_pad,
-            insets
+            insets,
         }
     }
 

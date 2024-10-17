@@ -1,16 +1,15 @@
 use bevy::prelude::{App, Event};
 
+pub mod any_event_writer;
+pub mod any_res_mut;
 pub mod async_event_writer;
+pub mod asynchronous;
 #[cfg(feature = "bevy_pkv")]
 pub mod tracked_resource;
 pub mod window_size;
-pub mod any_event_writer;
-pub mod any_res_mut;
-pub mod asynchronous;
 
+pub mod insets;
 pub mod layout;
-
-
 
 pub trait TrackableResource:
     bevy::prelude::Resource + serde::Serialize + serde::de::DeserializeOwned + Clone
@@ -18,7 +17,7 @@ pub trait TrackableResource:
     const KEY: &'static str;
 
     /// Optional function that is called when the resource is loaded
-    fn on_loaded(&mut self){}
+    fn on_loaded(&mut self) {}
 }
 
 pub trait CanInitTrackedResource {
@@ -54,7 +53,6 @@ pub trait CanRegisterAsyncEvent {
 
 impl CanRegisterAsyncEvent for App {
     fn register_async_event<E: Event>(&mut self) -> &mut Self {
-
         self.add_plugins(crate::async_event_writer::AsyncEventPlugin::<E>::default());
         self
     }

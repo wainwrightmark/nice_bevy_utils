@@ -10,7 +10,11 @@ impl Plugin for WindowSizePlugin {
         app.init_resource::<WindowSize>();
 
         app.add_systems(Update, handle_window_resized);
-        app.add_systems(PreUpdate, touch_text_2d_on_window_size_changed.run_if(|ws: Res<WindowSize>|ws.is_changed()));
+        #[cfg(feature="bevy_ui")]
+        app.add_systems(
+            PreUpdate,
+            touch_text_2d_on_window_size_changed.run_if(|ws: Res<WindowSize>| ws.is_changed()),
+        );
     }
 }
 
@@ -47,11 +51,15 @@ impl WindowSize {
 }
 
 impl<'w> From<&'w Window> for WindowSize {
-    fn from(value: &'w Window) -> Self {
+    fn from(window: &'w Window) -> Self {
+        let logical_height = window.height();
+        let logical_width = window.width();
+        let scale_factor = window.scale_factor();
+
         Self {
-            logical_height: value.height(),
-            logical_width: value.width(),
-            scale_factor: value.scale_factor(),
+            logical_height,
+            logical_width,
+            scale_factor,
         }
     }
 }
@@ -86,10 +94,13 @@ pub fn handle_window_resized(
     }
 }
 
-
-fn touch_text_2d_on_window_size_changed(ws: Res<WindowSize>, mut query: Query<&mut bevy::text::Text2dBounds>){
-    if ws.is_changed(){
-        for mut x in query.iter_mut(){
+#[cfg(feature="bevy_ui")]
+fn touch_text_2d_on_window_size_changed(
+    ws: Res<WindowSize>,
+    mut query: Query<&mut bevy::text::Text2dBounds>,
+) {
+    if ws.is_changed() {
+        for mut x in query.iter_mut() {
             x.set_changed();
         }
     }
