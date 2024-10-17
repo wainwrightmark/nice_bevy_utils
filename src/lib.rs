@@ -10,6 +10,7 @@ pub mod window_size;
 
 pub mod insets;
 pub mod layout;
+pub mod click;
 
 pub trait TrackableResource:
     bevy::prelude::Resource + serde::Serialize + serde::de::DeserializeOwned + Clone
