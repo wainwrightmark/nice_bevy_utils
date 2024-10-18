@@ -53,4 +53,25 @@ pub trait ScalableWindowSize {
 
         rect
     }
+
+    fn get_origin<T: LayoutPositioning + LayoutPositioningWithOrigin>(
+        &self,
+        entity: &T,
+        context: &T::Context<'_>,
+    ) -> Vec2 {
+        let rect = self.get_rect(entity, context);
+        let origin = entity.origin(context, &self.layout_sizing());
+
+        match origin {
+            Origin::Center => rect.centre(),
+            Origin::TopLeft => rect.top_left(),
+            Origin::CenterLeft => rect.centre_left(),
+            Origin::TopCenter => rect.top_centre(),
+            Origin::TopRight => rect.top_right(),
+            Origin::CenterRight => rect.centre_right(),
+            Origin::BottomLeft => rect.bottom_left(),
+            Origin::BottomCenter => rect.bottom_centre(),
+            Origin::BottomRight => rect.bottom_right(),
+        }
+    }
 }

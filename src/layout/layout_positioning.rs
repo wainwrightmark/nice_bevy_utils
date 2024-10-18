@@ -30,3 +30,24 @@ pub trait LayoutPositioningWithFont {
     type FontContext<'a>;
     fn font_size(&self, context: &Self::FontContext<'_>) -> f32;
 }
+
+
+pub trait LayoutPositioningWithOrigin: LayoutPositioning {
+    fn origin(&self, context: &Self::Context<'_>, sizing: &LayoutSizing) -> Origin;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Origin { //todo maybe use bevy anchor
+
+    TopLeft,
+    TopCenter,
+    TopRight,
+
+    CenterLeft,
+    Center,
+    CenterRight,
+
+    BottomLeft,
+    BottomCenter,
+    BottomRight
+}

@@ -7,9 +7,8 @@ pub struct LayoutRectangle {
 }
 
 impl LayoutRectangle {
-
     /// Top left is `(-0.5, 0.5)`, center is `(0.0, 0.0)`
-    pub fn anchor_point(&self, point: Vec2)-> Vec2{
+    pub fn anchor_point(&self, point: Vec2) -> Vec2 {
         Vec2 {
             x: self.top_left.x + (self.extents.x * (0.5 + point.x)),
             y: self.top_left.y + (self.extents.y * (0.5 - point.y)),
@@ -32,7 +31,7 @@ impl LayoutRectangle {
         }
     }
 
-    pub fn top_left(&self)-> Vec2{
+    pub fn top_left(&self) -> Vec2 {
         self.top_left
     }
 
@@ -41,9 +40,10 @@ impl LayoutRectangle {
             x: self.top_left.x + (self.extents.x * 0.5),
             y: self.top_left.y,
         }
-    }pub fn top_right(&self) -> Vec2 {
+    }
+    pub fn top_right(&self) -> Vec2 {
         Vec2 {
-            x: self.top_left.x + (self.extents.x ),
+            x: self.top_left.x + (self.extents.x),
             y: self.top_left.y,
         }
     }
@@ -72,6 +72,13 @@ impl LayoutRectangle {
     pub fn bottom_left(&self) -> Vec2 {
         Vec2 {
             x: self.top_left.x,
+            y: self.top_left.y + self.extents.y,
+        }
+    }
+
+    pub fn bottom_right(&self) -> Vec2 {
+        Vec2 {
+            x: self.top_left.x + self.extents.x,
             y: self.top_left.y + self.extents.y,
         }
     }
