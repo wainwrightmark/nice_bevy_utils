@@ -27,7 +27,7 @@ pub trait ScalableWindowSize {
         (window_size.logical_width / 4.0).min(window_size.logical_height / 8.0)
     }
 
-    fn font_size<T: LayoutPositioningWithFont>(
+    fn font_size<T: HasFontSize>(
         &self,
         entity: &T,
         context: &T::FontContext<'_>,
@@ -54,7 +54,7 @@ pub trait ScalableWindowSize {
         rect
     }
 
-    fn get_origin<T: LayoutPositioning + LayoutPositioningWithOrigin>(
+    fn get_origin<T: LayoutPositioning + HasOrigin>(
         &self,
         entity: &T,
         context: &T::Context<'_>,

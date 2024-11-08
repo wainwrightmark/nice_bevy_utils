@@ -100,7 +100,7 @@ impl LayoutSizing {
         }
     }
 
-    pub fn font_size<T: LayoutPositioningWithFont>(
+    pub fn font_size<T: HasFontSize>(
         &self,
         entity: &T,
         context: &T::FontContext<'_>,

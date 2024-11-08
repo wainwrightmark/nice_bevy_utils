@@ -25,7 +25,7 @@ pub struct MenuConstants {
     pub virtual_children: usize,
 }
 
-impl<T: MenuButtonPositioning> LayoutPositioningWithFont for T {
+impl<T: MenuButtonPositioning> HasFontSize for T {
     type FontContext<'a> = ();
 
     fn font_size(&self, _context: &Self::FontContext<'_>) -> f32 {
