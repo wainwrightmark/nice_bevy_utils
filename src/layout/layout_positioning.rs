@@ -37,7 +37,6 @@ pub trait HasOrigin: LayoutPositioning {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Origin {
-    //todo maybe use bevy anchor
     TopLeft,
     TopCenter,
     TopRight,
@@ -49,6 +48,69 @@ pub enum Origin {
     BottomLeft,
     BottomCenter,
     BottomRight,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum HorizontalOrigin {
+    Left,
+    Center,
+    Right,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum VerticalOrigin {
+    Top,
+    Center,
+    Bottom,
+}
+
+impl Into<HorizontalOrigin> for Origin {
+    fn into(self) -> HorizontalOrigin {
+        match self {
+            Origin::TopLeft => HorizontalOrigin::Left,
+            Origin::TopCenter => HorizontalOrigin::Center,
+            Origin::TopRight => HorizontalOrigin::Right,
+            Origin::CenterLeft => HorizontalOrigin::Left,
+            Origin::Center => HorizontalOrigin::Center,
+            Origin::CenterRight => HorizontalOrigin::Right,
+            Origin::BottomLeft => HorizontalOrigin::Left,
+            Origin::BottomCenter => HorizontalOrigin::Center,
+            Origin::BottomRight => HorizontalOrigin::Right,
+        }
+    }
+}
+
+impl Into<VerticalOrigin> for Origin {
+    fn into(self) -> VerticalOrigin {
+        match self {
+            Origin::TopLeft => VerticalOrigin::Top,
+            Origin::TopCenter => VerticalOrigin::Top,
+            Origin::TopRight => VerticalOrigin::Top,
+            Origin::CenterLeft => VerticalOrigin::Center,
+            Origin::Center => VerticalOrigin::Center,
+            Origin::CenterRight => VerticalOrigin::Center,
+            Origin::BottomLeft => VerticalOrigin::Bottom,
+            Origin::BottomCenter => VerticalOrigin::Bottom,
+            Origin::BottomRight => VerticalOrigin::Bottom,
+        }
+    }
+}
+
+#[cfg(any(test, feature = "bevy_ui"))]
+impl Into<bevy::sprite::Anchor> for Origin {
+    fn into(self) -> bevy::sprite::Anchor {
+        match self {
+            Origin::TopLeft => bevy::sprite::Anchor::TopLeft,
+            Origin::TopCenter => bevy::sprite::Anchor::TopCenter,
+            Origin::TopRight => bevy::sprite::Anchor::TopRight,
+            Origin::CenterLeft => bevy::sprite::Anchor::CenterLeft,
+            Origin::Center => bevy::sprite::Anchor::Center,
+            Origin::CenterRight => bevy::sprite::Anchor::CenterRight,
+            Origin::BottomLeft => bevy::sprite::Anchor::BottomLeft,
+            Origin::BottomCenter => bevy::sprite::Anchor::BottomCenter,
+            Origin::BottomRight => bevy::sprite::Anchor::BottomRight,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -98,7 +160,13 @@ mod tests {
             &LayoutSizing::from_page_size(Vec2::ZERO, 1.0, 256.0, Insets::new(0.0)),
         );
 
-        assert_eq!(rect, LayoutRectangle{ extents: Vec2 { x: 1.0, y: 2.0 }, top_left: Vec2{x: 3.0, y:4.0}});
+        assert_eq!(
+            rect,
+            LayoutRectangle {
+                extents: Vec2 { x: 1.0, y: 2.0 },
+                top_left: Vec2 { x: 3.0, y: 4.0 }
+            }
+        );
     }
 
     #[test]

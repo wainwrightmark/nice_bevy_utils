@@ -2,7 +2,7 @@
 name = "nice-bevy-utils-macro"
 description = "Proc macro for `nice_bevy_utils`. Do not use directly."
 readme = "../README.md"
-version = "0.1.0"
+version = "0.14.2"
 edition = "2021"
 
 [lib]

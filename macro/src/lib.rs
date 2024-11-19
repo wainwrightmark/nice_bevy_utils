@@ -60,13 +60,13 @@ pub fn derive_layout_positioning(input: TokenStream) -> TokenStream{
         {
             type Context<'a> = ();
 
-            fn size(&self, _context: &Self::Context<'_>, _sizing: &LayoutSizing) -> Vec2 {
+            fn size(&self, _context: &Self::Context<'_>, _sizing: &nice_bevy_utils::layout::layout_sizing::LayoutSizing) -> bevy::prelude::Vec2 {
                 let x = #width;
                 let y = #height;
                 Vec2{x,y}
             }
 
-            fn location(&self, _context: &Self::Context<'_>, _sizing: &LayoutSizing) -> Vec2 {
+            fn location(&self, _context: &Self::Context<'_>, _sizing: &nice_bevy_utils::layout::layout_sizing::LayoutSizing) -> bevy::prelude::Vec2 {
                 let x = #left;
                 let y = #top;
                 Vec2{x,y}
@@ -120,7 +120,7 @@ pub fn derive_has_origin(input: TokenStream) -> TokenStream {
     TokenStream::from(quote! {
         impl #impl_generics nice_bevy_utils::layout::layout_positioning::HasOrigin for #struct_name #ty_generics #where_clause
         {
-            fn origin(&self, context: &Self::Context<'_>, sizing: &LayoutSizing) -> Origin
+            fn origin(&self, context: &Self::Context<'_>, sizing: &nice_bevy_utils::layout::layout_sizing::LayoutSizing) -> nice_bevy_utils::layout::layout_positioning::Origin
             {
                  #origin_expression
             }
